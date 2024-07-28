@@ -7,6 +7,7 @@ import (
 	"go-blockchain/config"
 	"go-blockchain/core/persistant"
 	"strings"
+	"time"
 )
 
 type BlockChain struct {
@@ -14,18 +15,31 @@ type BlockChain struct {
 }
 
 func NewBlockChain(chain persistant.Persister) *BlockChain {
-	return &BlockChain{
+	ch := BlockChain{
 		Chain: chain,
 	}
+	genesisBlock := Block{
+		Data:         "Genesis Block",
+		PreviousHash: nil,
+		Timestamp:    time.Now(),
+	}
+	genesisBlock.mine()
+	ch.AddBlock(&genesisBlock)
+	return &ch
 }
 
 func (c *BlockChain) AddBlock(block *Block) error {
 	previousBlock, _ := c.Chain.GetLastBlock()
-	if string(previousBlock.Hash) == string(block.PreviousHash) {
-		if ValidateHashComplexity(CalculateHash(*block)) {
-			c.Chain.Save(*block)
+	if previousBlock.PreviousHash != nil {
+		if string(previousBlock.Hash) == string(block.PreviousHash) {
+			if ValidateHashComplexity(CalculateHash(*block)) {
+				c.Chain.Save(*block)
+			}
 		}
+	} else {
+		c.Chain.Save(*block)
 	}
+
 	return nil
 }
 
