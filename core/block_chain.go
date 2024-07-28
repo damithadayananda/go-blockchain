@@ -5,17 +5,25 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"go-blockchain/config"
+	"go-blockchain/core/persistant"
 	"strings"
 )
 
 type BlockChain struct {
-	Blocks []*Block
+	Chain persistant.Persister
+}
+
+func NewBlockChain(chain persistant.Persister) *BlockChain {
+	return &BlockChain{
+		Chain: chain,
+	}
 }
 
 func (c *BlockChain) AddBlock(block *Block) error {
-	if string(c.Blocks[len(c.Blocks)-1].Hash) == string(block.PreviousHash) {
+	previousBlock, _ := c.Chain.GetLastBlock()
+	if string(previousBlock.Hash) == string(block.PreviousHash) {
 		if ValidateHashComplexity(CalculateHash(*block)) {
-			c.Blocks = append(c.Blocks, block)
+			c.Chain.Save(*block)
 		}
 	}
 	return nil
