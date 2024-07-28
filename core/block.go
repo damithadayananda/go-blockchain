@@ -17,10 +17,6 @@ type Block struct {
 	Nonce        int32
 }
 
-type IBlock interface {
-	mine() []byte
-}
-
 func (b *Block) mine() {
 	for {
 		b.Nonce++
@@ -31,6 +27,7 @@ func (b *Block) mine() {
 		subString := bytString[:3]
 		numOfZeroes := strings.Count(subString, "0")
 		if numOfZeroes == int(config.AppConfig.Complexity) {
+			b.Hash = []byte(bytString)
 			break
 		}
 	}

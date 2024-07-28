@@ -12,7 +12,7 @@ type config struct {
 }
 
 func InitConfig() {
-	b, e := ioutil.ReadFile("config.yml")
+	b, e := ioutil.ReadFile("./config/config.yml")
 	if e != nil {
 		panic(e)
 	}
