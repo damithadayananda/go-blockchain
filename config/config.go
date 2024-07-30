@@ -8,7 +8,8 @@ import (
 var AppConfig config
 
 type config struct {
-	Complexity int8 `yaml:"complexity"`
+	Complexity              int8 `yaml:"complexity"`
+	MaxTransactionsPerBlock int  `yaml:"maxTransactionsPerBlock"`
 }
 
 func InitConfig() {

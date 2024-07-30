@@ -1,4 +1,4 @@
-package core
+package block
 
 import (
 	"crypto/sha256"
@@ -17,7 +17,7 @@ type Block struct {
 	Nonce        int32
 }
 
-func (b *Block) mine() {
+func (b *Block) Mine() {
 	for {
 		b.Nonce++
 		sha := sha256.New()

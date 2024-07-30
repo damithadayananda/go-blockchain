@@ -8,7 +8,10 @@ import (
 	"strings"
 )
 
-func RegisterUi(mux *http.ServeMux) {
+type UI struct {
+}
+
+func (u *UI) RegisterUi(mux *http.ServeMux) {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		requestedPath := r.URL.Path
 		if requestedPath == "/" {

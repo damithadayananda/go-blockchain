@@ -1,49 +1,56 @@
-package core
+package blockchain
 
 import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"go-blockchain/config"
+	"go-blockchain/core/block"
 	"go-blockchain/core/persistant"
 	"strings"
 	"time"
 )
 
+var Chain *BlockChain
+
 type BlockChain struct {
-	Chain persistant.Persister
+	database persistant.BlockChainDBInterface
 }
 
-func NewBlockChain(chain persistant.Persister) *BlockChain {
+func NewBlockChain(database persistant.BlockChainDBInterface) {
 	ch := BlockChain{
-		Chain: chain,
+		database: database,
 	}
-	genesisBlock := Block{
+	genesisBlock := block.Block{
 		Data:         "Genesis Block",
 		PreviousHash: nil,
 		Timestamp:    time.Now(),
 	}
-	genesisBlock.mine()
+	genesisBlock.Mine()
 	ch.AddBlock(&genesisBlock)
-	return &ch
+	Chain = &ch
 }
 
-func (c *BlockChain) AddBlock(block *Block) error {
-	previousBlock, _ := c.Chain.GetLastBlock()
+func (c *BlockChain) GetChain() ([]block.Block, error) {
+	return c.database.GetAll()
+}
+
+func (c *BlockChain) AddBlock(block *block.Block) error {
+	previousBlock, _ := c.database.GetLastBlock()
 	if previousBlock.PreviousHash != nil {
 		if string(previousBlock.Hash) == string(block.PreviousHash) {
 			if ValidateHashComplexity(CalculateHash(*block)) {
-				c.Chain.Save(*block)
+				c.database.Save(*block)
 			}
 		}
 	} else {
-		c.Chain.Save(*block)
+		c.database.Save(*block)
 	}
 
 	return nil
 }
 
-func CalculateHash(block Block) string {
+func CalculateHash(block block.Block) string {
 	block.Hash = []byte{}
 	by, _ := json.Marshal(block)
 	sha := sha256.New()
@@ -60,6 +67,6 @@ func ValidateHashComplexity(hash string) bool {
 	return false
 }
 
-func (c *BlockChain) ValidateBlock(block *Block) error {
+func (c *BlockChain) ValidateBlock(block *block.Block) error {
 	return nil
 }

@@ -4,10 +4,10 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"go-blockchain/core"
+	"go-blockchain/core/block"
 )
 
-func calculateHash(block core.Block) []byte {
+func calculateHash(block block.Block) []byte {
 	sha := sha256.New()
 	byt, e := json.Marshal(block)
 	if e != nil {
