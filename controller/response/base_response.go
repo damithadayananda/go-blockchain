@@ -1,10 +1,13 @@
 package response
 
-type SuccessResponse struct {
+type BaseResponse struct {
 	Success bool `json:"success"`
+}
+type SuccessResponse struct {
+	BaseResponse
 }
 
 type FailResponse struct {
-	Success bool   `json:"success"`
-	Error   string `json:"error"`
+	BaseResponse
+	Error string `json:"error"`
 }

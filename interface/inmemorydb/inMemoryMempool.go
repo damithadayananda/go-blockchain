@@ -3,12 +3,13 @@ package inmemorydb
 import (
 	"go-blockchain/config"
 	"go-blockchain/core/transaction"
+	"go-blockchain/domain"
 	"sort"
 	"sync"
 )
 
 type InMemoryMemPool struct {
-	mempool []transaction.Transaction
+	mempool []*transaction.Transaction
 	lock    sync.RWMutex
 }
 
@@ -18,19 +19,25 @@ func NewInMemoryMemPool() *InMemoryMemPool {
 func (im *InMemoryMemPool) Save(transaction transaction.Transaction) error {
 	im.lock.Lock()
 	defer im.lock.Unlock()
-	im.mempool = append(im.mempool, transaction)
+	im.mempool = append(im.mempool, &transaction)
 	return nil
 }
 
+// TODO need to think of more generic implementation
 func (im *InMemoryMemPool) Get() ([]transaction.Transaction, error) {
 	im.lock.RLock()
 	defer im.lock.RUnlock()
-	sort.Slice(im.mempool, func(i, j int) bool {
-		return im.mempool[i].Fee >= im.mempool[j].Fee
+	var eligibleTransactions []transaction.Transaction
+	for _, txn := range im.mempool {
+		if txn.MiningStatus == domain.READY_FOR_MINING {
+			eligibleTransactions = append(eligibleTransactions, *txn)
+		}
+	}
+	sort.Slice(eligibleTransactions, func(i, j int) bool {
+		return eligibleTransactions[i].Fee >= eligibleTransactions[j].Fee
 	})
-	if len(im.mempool) >= config.AppConfig.MaxTransactionsPerBlock {
-
-		return im.mempool[:config.AppConfig.MaxTransactionsPerBlock], nil
+	if len(eligibleTransactions) >= config.AppConfig.MaxTransactionsPerBlock {
+		return eligibleTransactions[:config.AppConfig.MaxTransactionsPerBlock], nil
 	}
 	return nil, nil
 }
@@ -38,7 +45,11 @@ func (im *InMemoryMemPool) Get() ([]transaction.Transaction, error) {
 func (im *InMemoryMemPool) GetAll() []transaction.Transaction {
 	im.lock.RLock()
 	defer im.lock.RUnlock()
-	return im.mempool
+	var transaction []transaction.Transaction
+	for _, txn := range im.mempool {
+		transaction = append(transaction, *txn)
+	}
+	return transaction
 }
 
 func (im *InMemoryMemPool) Delete(id string) {
@@ -49,4 +60,15 @@ func (im *InMemoryMemPool) Delete(id string) {
 			im.mempool = append(im.mempool[:k], im.mempool[k+1:]...)
 		}
 	}
+}
+
+func (im *InMemoryMemPool) MiningStatusUpdate(id string, status domain.MiningStates) error {
+	im.lock.Lock()
+	defer im.lock.Unlock()
+	for _, v := range im.mempool {
+		if v.Id == id {
+			v.MiningStatus = status
+		}
+	}
+	return nil
 }

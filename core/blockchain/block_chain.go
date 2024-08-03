@@ -26,7 +26,8 @@ func NewBlockChain(database persistant.BlockChainDBInterface) {
 		PreviousHash: nil,
 		Timestamp:    time.Now(),
 	}
-	genesisBlock.Mine()
+	done := make(chan bool)
+	go genesisBlock.Mine(nil, done)
 	ch.AddBlock(&genesisBlock)
 	Chain = &ch
 }
@@ -48,6 +49,10 @@ func (c *BlockChain) AddBlock(block *block.Block) error {
 	}
 
 	return nil
+}
+
+func (c *BlockChain) GetLastBlock() (block.Block, error) {
+	return c.database.GetLastBlock()
 }
 
 func CalculateHash(block block.Block) string {
