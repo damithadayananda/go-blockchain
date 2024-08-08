@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/gorilla/mux"
 	"go-blockchain/ui"
 	"io"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 type UI struct {
 }
 
-func (u *UI) RegisterUi(mux *http.ServeMux) {
+func (u *UI) RegisterUi(mux *mux.Router) {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		requestedPath := r.URL.Path
 		if requestedPath == "/" {

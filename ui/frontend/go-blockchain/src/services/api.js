@@ -1,0 +1,24 @@
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8080/chain';
+const TRANSACTION_URL = 'http://localhost:8080/transaction';
+
+
+export const fetchChain = async () => {
+    const response = await axios.get(API_URL);
+    return response.data.result;
+};
+
+export const submitTransaction = async (transaction) => {
+    try {
+        const response = await axios.post(TRANSACTION_URL, transaction, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error submitting the transaction:", error);
+        throw error;
+    }
+};

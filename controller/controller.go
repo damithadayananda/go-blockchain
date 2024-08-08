@@ -38,6 +38,7 @@ func (cr *ApiControllerImpl) AddTransaction(r *http.Request) interface{} {
 	app.Logger.Info.Log("Add Transaction Request Body: ", string(reqBody))
 	txnRequest := request.TransactionRequest{}
 	if err := json.Unmarshal(reqBody, &txnRequest); err != nil {
+		app.Logger.Error.Log("Unmarshal err: ", err)
 		return response.FailResponse{
 			BaseResponse: response.BaseResponse{
 				Success: false,
