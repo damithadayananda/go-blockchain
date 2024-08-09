@@ -1,2 +1,7 @@
 complexity: 3
 maxTransactionsPerBlock: 2
+
+## node
+host: http://localhost
+port: 8081
+nodeDistributionTimeOut: 30

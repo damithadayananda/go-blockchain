@@ -5,7 +5,6 @@ import (
 	"go-blockchain/app"
 	"go-blockchain/controller/request"
 	"go-blockchain/controller/response"
-	"go-blockchain/core/blockchain"
 	"go-blockchain/core/mempool"
 	"go-blockchain/core/transaction"
 	"go-blockchain/domain"
@@ -13,27 +12,14 @@ import (
 	"net/http"
 )
 
-type ApiController interface {
-	GetChain() response.ChainResponse
-	AddTransaction(request *http.Request) interface{}
+type TransactionController interface {
+	AddTransaction(r *http.Request) interface{}
 }
 
-type ApiControllerImpl struct {
+type TransactionControllerImpl struct {
 }
 
-func (cr *ApiControllerImpl) GetChain() response.ChainResponse {
-	chain, _ := blockchain.Chain.GetChain()
-	return response.ChainResponse{
-		SuccessResponse: response.SuccessResponse{
-			BaseResponse: response.BaseResponse{
-				Success: true,
-			},
-		},
-		Result: chain,
-	}
-}
-
-func (cr *ApiControllerImpl) AddTransaction(r *http.Request) interface{} {
+func (cr *TransactionControllerImpl) AddTransaction(r *http.Request) interface{} {
 	reqBody, _ := io.ReadAll(r.Body)
 	app.Logger.Info.Log("Add Transaction Request Body: ", string(reqBody))
 	txnRequest := request.TransactionRequest{}

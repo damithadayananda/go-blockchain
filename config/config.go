@@ -8,8 +8,11 @@ import (
 var AppConfig config
 
 type config struct {
-	Complexity              int8 `yaml:"complexity"`
-	MaxTransactionsPerBlock int  `yaml:"maxTransactionsPerBlock"`
+	Complexity              int8   `yaml:"complexity"`
+	MaxTransactionsPerBlock int    `yaml:"maxTransactionsPerBlock"`
+	Host                    string `yaml:"host"`
+	Port                    int    `yaml:"port"`
+	NodeDistributionTimeOut int    `yaml:"nodeDistributionTimeOut"`
 }
 
 func InitConfig() {

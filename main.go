@@ -5,6 +5,7 @@ import (
 	"go-blockchain/core/blockchain"
 	"go-blockchain/core/mempool"
 	"go-blockchain/core/minor"
+	"go-blockchain/core/node"
 	"go-blockchain/interface/http"
 	"go-blockchain/interface/inmemorydb"
 )
@@ -22,6 +23,10 @@ func main() {
 	mempool.NewMemPool(transactionDb)
 	// starting minor
 	minor.NewMinor()
+	// initializing node db
+	nodeDb := inmemorydb.NewInMemoryNode()
+	//initializing node
+	node.NewNode(nodeDb)
 	//initializing http server
 	http.InitServer()
 }
