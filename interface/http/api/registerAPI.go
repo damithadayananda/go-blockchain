@@ -11,15 +11,19 @@ type API struct {
 	transactionController controller.TransactionController
 	chainController       controller.ChainController
 	nodeController        controller.NodeController
+	blockController       controller.BlockController
 }
 
 func (api *API) RegisterAPI(mux *mux.Router,
 	trCtr controller.TransactionController,
 	cCtr controller.ChainController,
-	nCtr controller.NodeController) {
+	nCtr controller.NodeController,
+	bCtr controller.BlockController) {
 	api.transactionController = trCtr
 	api.chainController = cCtr
 	api.nodeController = nCtr
+	api.blockController = bCtr
+
 	mux.HandleFunc("/chain", func(w http.ResponseWriter, r *http.Request) {
 		data, _ := json.Marshal(api.chainController.GetChain())
 		w.Write(data)
@@ -37,6 +41,13 @@ func (api *API) RegisterAPI(mux *mux.Router,
 	})
 	node.HandleFunc("/get", func(w http.ResponseWriter, r *http.Request) {
 		data, _ := json.Marshal(api.nodeController.GetNode(r))
+		w.Write(data)
+	})
+
+	// block routes
+	block := mux.PathPrefix("/block").Subrouter()
+	block.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
+		data, _ := json.Marshal(api.blockController.AddBlock(r))
 		w.Write(data)
 	})
 }

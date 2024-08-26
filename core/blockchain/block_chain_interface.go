@@ -9,4 +9,5 @@ type BlockChainInterface interface {
 	ValidateBlock(block *block.Block) error
 	GetChain() ([]block.Block, error)
 	GetLastBlock() (block.Block, error)
+	distributeBlock(block *block.Block) error
 }

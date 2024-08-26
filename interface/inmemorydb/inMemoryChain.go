@@ -12,6 +12,12 @@ func NewInMemoryChain() *InMemoryChain {
 	return &InMemoryChain{}
 }
 func (chain *InMemoryChain) Save(value block.Block) error {
+	if len(chain.blocks) == 0 {
+		value.Index = 1
+		chain.blocks = append(chain.blocks, value)
+		return nil
+	}
+	value.Index += chain.blocks[len(chain.blocks)-1].Index // increasing the index
 	chain.blocks = append(chain.blocks, value)
 	return nil
 }
@@ -21,5 +27,8 @@ func (chain *InMemoryChain) GetAll() ([]block.Block, error) {
 }
 
 func (chain *InMemoryChain) GetLastBlock() (block.Block, error) {
-	return block.Block{}, nil
+	if len(chain.blocks) == 0 {
+		return block.Block{}, nil
+	}
+	return chain.blocks[len(chain.blocks)-1], nil
 }

@@ -18,7 +18,8 @@ func InitServer() {
 	apiHandler.RegisterAPI(mux,
 		&controller.TransactionControllerImpl{},
 		&controller.ChainControllerImpl{},
-		&controller.NodeControllerImpl{})
+		&controller.NodeControllerImpl{},
+		&controller.BlockControllerImpl{})
 	uiHandler := ui.UI{}
 	uiHandler.RegisterUi(mux)
 

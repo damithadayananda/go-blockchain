@@ -3,7 +3,7 @@ package block
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
+	"fmt"
 	"go-blockchain/app"
 	"go-blockchain/config"
 	"strings"
@@ -11,9 +11,10 @@ import (
 )
 
 type Block struct {
-	Data         any
-	Hash         []byte
-	PreviousHash []byte
+	Index        int64
+	Data         DataInterface
+	Hash         string
+	PreviousHash string
 	Timestamp    time.Time
 	Nonce        int32
 }
@@ -34,13 +35,13 @@ func (b *Block) Mine(stop <-chan bool, done chan<- bool) (interrupted bool) {
 			for {
 				b.Nonce++
 				sha := sha256.New()
-				by, _ := json.Marshal(b)
-				sha.Write(by)
+				valueString := fmt.Sprintf("data: %v, previousHash: %v, nonce: %v ", b.Data.ToString(), b.PreviousHash, b.Nonce)
+				sha.Write([]byte(valueString))
 				bytString := hex.EncodeToString(sha.Sum(nil))
 				subString := bytString[:3]
 				numOfZeroes := strings.Count(subString, "0")
 				if numOfZeroes == int(config.AppConfig.Complexity) {
-					b.Hash = []byte(bytString)
+					b.Hash = bytString
 					// ending mining operation
 					app.Logger.Info.Log("Mining is complete")
 					done <- true

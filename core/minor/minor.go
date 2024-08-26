@@ -65,8 +65,8 @@ func (minor *minorImp) mine() {
 	}
 	pb, _ := minor.chain.GetLastBlock()
 	b := block.Block{
-		Data:         txn,
-		PreviousHash: pb.PreviousHash,
+		Data:         transaction.TransactionList(txn),
+		PreviousHash: pb.Hash,
 		Timestamp:    time.Now(),
 	}
 	interrupted := b.Mine(minor.stopChan, minor.doneChan)
