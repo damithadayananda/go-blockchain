@@ -2,22 +2,24 @@ package config
 
 import (
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
+	"os"
 )
 
 var AppConfig config
 
 type config struct {
-	Complexity               int8   `yaml:"complexity"`
-	MaxTransactionsPerBlock  int    `yaml:"maxTransactionsPerBlock"`
-	Host                     string `yaml:"host"`
-	Port                     int    `yaml:"port"`
-	NodeDistributionTimeOut  int    `yaml:"nodeDistributionTimeOut"`
-	BlockDistributionTimeOut int    `yaml:"blockDistributionTimeout"`
+	Complexity               int8     `yaml:"complexity"`
+	MaxTransactionsPerBlock  int      `yaml:"maxTransactionsPerBlock"`
+	Host                     string   `yaml:"host"`
+	Port                     int      `yaml:"port"`
+	NodeDistributionTimeOut  int      `yaml:"nodeDistributionTimeOut"`
+	BlockDistributionTimeOut int      `yaml:"blockDistributionTimeout"`
+	KnownNodes               []string `yaml:"knownNodes"`
 }
 
 func InitConfig() {
-	b, e := ioutil.ReadFile("./config/config.yml")
+	configPath := os.Getenv("CONFIG_PATH")
+	b, e := os.ReadFile(configPath)
 	if e != nil {
 		panic(e)
 	}

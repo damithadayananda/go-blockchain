@@ -1,5 +1,5 @@
 package block
 
 type IBlock interface {
-	mine() []byte
+	Mine(stop <-chan bool, done chan<- bool) (interrupted bool)
 }

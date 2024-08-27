@@ -3,6 +3,7 @@ package block
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"go-blockchain/app"
 	"go-blockchain/config"
@@ -12,7 +13,8 @@ import (
 
 type Block struct {
 	Index        int64
-	Data         DataInterface
+	Data         interface{}
+	MerkleRoot   string
 	Hash         string
 	PreviousHash string
 	Timestamp    time.Time
@@ -35,7 +37,7 @@ func (b *Block) Mine(stop <-chan bool, done chan<- bool) (interrupted bool) {
 			for {
 				b.Nonce++
 				sha := sha256.New()
-				valueString := fmt.Sprintf("data: %v, previousHash: %v, nonce: %v ", b.Data.ToString(), b.PreviousHash, b.Nonce)
+				valueString := fmt.Sprintf("merkleRoot: %v, previousHash: %v, nonce: %v ", b.MerkleRoot, b.PreviousHash, b.Nonce)
 				sha.Write([]byte(valueString))
 				bytString := hex.EncodeToString(sha.Sum(nil))
 				subString := bytString[:3]
@@ -51,4 +53,11 @@ func (b *Block) Mine(stop <-chan bool, done chan<- bool) (interrupted bool) {
 		}
 
 	}
+}
+
+func (b *Block) CalculateMerkleRoot() {
+	sha := sha256.New()
+	byteArray, _ := json.Marshal(b.Data)
+	sha.Write(byteArray)
+	b.MerkleRoot = hex.EncodeToString(sha.Sum(nil))
 }

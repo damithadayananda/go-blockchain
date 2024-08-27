@@ -13,7 +13,7 @@ func TestCalculateHash(t *testing.T) {
 	bc := BlockChain{}
 	b := block.Block{
 		Index: 0,
-		Data: transaction.TransactionList([]transaction.Transaction{
+		Data: transaction.List([]transaction.Transaction{
 			transaction.Transaction{
 				Id:           "504e914d-0b23-4091-a8d4-ba047cc67cc9",
 				Amount:       300,

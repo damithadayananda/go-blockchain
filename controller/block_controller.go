@@ -5,7 +5,6 @@ import (
 	"go-blockchain/app"
 	"go-blockchain/controller/request"
 	"go-blockchain/controller/response"
-	"go-blockchain/core/block"
 	"go-blockchain/core/blockchain"
 	"io"
 	"net/http"
@@ -30,7 +29,7 @@ func (bc BlockControllerImpl) AddBlock(r *http.Request) interface{} {
 			Error: err.Error(),
 		}
 	}
-	coreBlock := addBlockReq.ToCoreBlock()
+	coreBlock, _ := addBlockReq.ToCoreBlock()
 	err := blockchain.Chain.AddBlock(&coreBlock)
 	if err != nil {
 		return response.FailResponse{
@@ -44,19 +43,5 @@ func (bc BlockControllerImpl) AddBlock(r *http.Request) interface{} {
 		BaseResponse: response.BaseResponse{
 			Success: true,
 		},
-	}
-}
-
-func toCoreBlock(b request.Block) block.Block {
-	// instead of this manual copying we can use library like
-	// github.com/jinzhu/copier
-
-	return block.Block{
-		Index: b.Index,
-		//Data:         transaction.TransactionList(b.Data),
-		Hash:         b.Hash,
-		PreviousHash: b.PreviousHash,
-		Timestamp:    b.Timestamp,
-		Nonce:        b.Nonce,
 	}
 }

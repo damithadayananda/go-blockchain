@@ -13,17 +13,12 @@ import (
 	"go-blockchain/core/persistant"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
 
 var Chain *BlockChain
-
-type sstring string
-
-func (s sstring) ToString() string {
-	return string(s)
-}
 
 type BlockChain struct {
 	database persistant.BlockChainDBInterface
@@ -34,10 +29,11 @@ func NewBlockChain(database persistant.BlockChainDBInterface) {
 		database: database,
 	}
 	genesisBlock := block.Block{
-		Data:         sstring("Genesis Block"),
+		Data:         "Genesis Block",
 		PreviousHash: "",
 		Timestamp:    time.Now(),
 	}
+	genesisBlock.CalculateMerkleRoot()
 	done := make(chan bool)
 	go genesisBlock.Mine(nil, done)
 	<-done
@@ -77,7 +73,7 @@ func (c *BlockChain) GetLastBlock() (block.Block, error) {
 }
 
 func (c *BlockChain) calculateHash(block block.Block) string {
-	valueString := fmt.Sprintf("data: %v, previousHash: %v, nonce: %v ", block.Data.ToString(), block.PreviousHash, block.Nonce)
+	valueString := fmt.Sprintf("merkleRoot: %v, previousHash: %v, nonce: %v ", block.MerkleRoot, block.PreviousHash, block.Nonce)
 	sha := sha256.New()
 	sha.Write([]byte(valueString))
 	return hex.EncodeToString(sha.Sum(nil))
@@ -97,12 +93,12 @@ func (c *BlockChain) ValidateBlock(block *block.Block) error {
 }
 
 func (c *BlockChain) distributeBlock(block *block.Block) error {
-	knownNodes, err := node.NodeRef.GetNodes()
+	nodesToBeInformed, err := c.getNodesToBeInformed()
 	if err != nil {
 		return err
 	}
 
-	for _, node := range knownNodes {
+	for _, node := range nodesToBeInformed {
 		body, _ := json.Marshal(block)
 		req, _ := http.NewRequest(http.MethodPost, node+"/block/add", bytes.NewBuffer(body))
 		client := &http.Client{
@@ -117,4 +113,19 @@ func (c *BlockChain) distributeBlock(block *block.Block) error {
 		app.Logger.Info.Log(fmt.Sprintf("Request to: %s, Response: %v, Error: %v", node, string(data), err))
 	}
 	return nil
+}
+
+func (c *BlockChain) getNodesToBeInformed() ([]string, error) {
+	knownNodes, err := node.NodeRef.GetNodes()
+	if err != nil {
+		return nil, err
+	}
+	var list []string
+	for _, knownNode := range knownNodes {
+		if knownNode == (config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port)) {
+			continue
+		}
+		list = append(list, knownNode)
+	}
+	return list, nil
 }

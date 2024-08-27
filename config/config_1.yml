@@ -3,7 +3,7 @@ maxTransactionsPerBlock: 2
 
 ## node
 host: http://localhost
-port: 8081
+port: 8080
 nodeDistributionTimeOut: 30
 knownNodes:
   - http://localhost:8081

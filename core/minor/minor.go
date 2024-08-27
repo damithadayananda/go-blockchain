@@ -65,10 +65,11 @@ func (minor *minorImp) mine() {
 	}
 	pb, _ := minor.chain.GetLastBlock()
 	b := block.Block{
-		Data:         transaction.TransactionList(txn),
+		Data:         txn,
 		PreviousHash: pb.Hash,
 		Timestamp:    time.Now(),
 	}
+	b.CalculateMerkleRoot()
 	interrupted := b.Mine(minor.stopChan, minor.doneChan)
 	minor.chain.AddBlock(&b)
 	// since mine function is thread safe
