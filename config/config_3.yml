@@ -1,0 +1,14 @@
+complexity: 3
+maxTransactionsPerBlock: 2
+
+## node
+host: http://localhost
+port: 8081
+nodeDistributionTimeOut: 300
+knownNodes:
+  - http://localhost:8080
+  - http://localhost:8082
+  - http://localhost:8081
+
+## block
+blockDistributionTimeout: 300

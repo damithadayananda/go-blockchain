@@ -2,12 +2,18 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8080/chain';
 const TRANSACTION_URL = 'http://localhost:8080/transaction';
+const NODE_URL = 'http://localhost:8080/node/get';
 
 
 export const fetchChain = async () => {
     const response = await axios.get(API_URL);
     return response.data.result;
 };
+
+export const fetchNodes = async () => {
+    const response = await axios.get(NODE_URL)
+    return response.data.result;
+}
 
 export const submitTransaction = async (transaction) => {
     try {
