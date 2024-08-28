@@ -25,6 +25,9 @@ const Block = ({ block }) => {
                         <strong>Previous Hash:</strong> {block.PreviousHash}
                     </Typography>
                     <Typography variant="body2" component="div">
+                        <strong>Merkle Root:</strong> {block.MerkleRoot}
+                    </Typography>
+                    <Typography variant="body2" component="div">
                         <strong>Timestamp:</strong> {block.Timestamp}
                     </Typography>
                     <Typography variant="body2" component="div">
