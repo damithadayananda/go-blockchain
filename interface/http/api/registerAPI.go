@@ -50,4 +50,8 @@ func (api *API) RegisterAPI(mux *mux.Router,
 		data, _ := json.Marshal(api.blockController.AddBlock(r))
 		w.Write(data)
 	})
+	block.HandleFunc("/{no-of-blocks}", func(w http.ResponseWriter, r *http.Request) {
+		data, _ := json.Marshal(api.blockController.GetBlocks(r))
+		w.Write(data)
+	})
 }

@@ -14,6 +14,7 @@ type config struct {
 	Port                     int      `yaml:"port"`
 	NodeDistributionTimeOut  int      `yaml:"nodeDistributionTimeOut"`
 	BlockDistributionTimeOut int      `yaml:"blockDistributionTimeout"`
+	BlockInquiryTimeOut      int      `yaml:"blockInquiryTimeOut"`
 	KnownNodes               []string `yaml:"knownNodes"`
 }
 

@@ -32,7 +32,12 @@ func (cr *TransactionControllerImpl) AddTransaction(r *http.Request) interface{}
 			Error: err.Error(),
 		}
 	}
-	txn := transaction.NewTransaction(txnRequest)
+	txn := transaction.NewTransaction(transaction.Transaction{
+		Amount:   txnRequest.Amount,
+		Receiver: txnRequest.Receiver,
+		Sender:   txnRequest.Sender,
+		Fee:      txnRequest.Fee,
+	})
 	txn.SetMiningStatus(domain.READY_FOR_MINING)
 	mempool.Mempool.Save(txn)
 	return response.SuccessResponse{

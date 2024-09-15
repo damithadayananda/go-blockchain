@@ -64,11 +64,11 @@ func (cr *NodeControllerImpl) distributingNodeDetails(nodeRequest request.AddNod
 	for _, url := range nodesToBeInformed {
 		body, _ := json.Marshal(request.AddNodeRequest{
 			Url:           nodeRequest.Url,
-			InformedNodes: knownNodes,
+			InformedNodes: append(nodeRequest.InformedNodes, nodesToBeInformed...),
 		})
 		req, _ := http.NewRequest(http.MethodPost, url+"/node/add", bytes.NewReader(body))
 		client := http.Client{
-			Timeout: time.Duration(time.Second * time.Duration(config.AppConfig.NodeDistributionTimeOut)),
+			Timeout: time.Second * time.Duration(config.AppConfig.NodeDistributionTimeOut),
 		}
 		res, err := client.Do(req)
 		var data []byte
@@ -83,15 +83,18 @@ func (cr *NodeControllerImpl) distributingNodeDetails(nodeRequest request.AddNod
 func getNodesToBeInformed(receivedNodes, savedNodes []string) []string {
 	nodes := make([]string, 0)
 	for _, v := range savedNodes {
+		var found bool
 		for _, node := range receivedNodes {
 			if v == node {
-				continue
+				found = true
 			}
 		}
-		if v == fmt.Sprintf("%v:%v", config.AppConfig.Host, config.AppConfig.Port) {
-			continue
+		//if v == fmt.Sprintf("%v:%v", config.AppConfig.Host, config.AppConfig.Port) {
+		//	continue
+		//}
+		if !found {
+			nodes = append(nodes, v)
 		}
-		nodes = append(nodes, v)
 	}
 	return nodes
 }

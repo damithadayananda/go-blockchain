@@ -11,3 +11,4 @@ knownNodes:
 
 ## block
 blockDistributionTimeout: 30
+blockInquiryTimeOut: 30

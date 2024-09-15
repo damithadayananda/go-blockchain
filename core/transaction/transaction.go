@@ -2,18 +2,17 @@ package transaction
 
 import (
 	"github.com/google/uuid"
-	"go-blockchain/controller/request"
 	"go-blockchain/domain"
 )
 
 type Transaction struct {
-	Id           string
-	Amount       float64
-	Receiver     string
-	Sender       string
-	Fee          float64
-	Size         int
-	MiningStatus domain.MiningStates
+	Id           string              `json:"id"`
+	Amount       float64             `json:"amount"`
+	Receiver     string              `json:"receiver"`
+	Sender       string              `json:"sender"`
+	Fee          float64             `json:"fee"`
+	Size         int                 `json:"size"`
+	MiningStatus domain.MiningStates `json:"miningStatus"`
 }
 
 func (t *Transaction) generateId() {
@@ -27,7 +26,7 @@ func (t *Transaction) SetMiningStatus(state domain.MiningStates) {
 	t.MiningStatus = state
 }
 
-func NewTransaction(request request.TransactionRequest) Transaction {
+func NewTransaction(request Transaction) Transaction {
 	transaction := Transaction{
 		Amount:   request.Amount,
 		Receiver: request.Receiver,

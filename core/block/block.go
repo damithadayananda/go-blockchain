@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"go-blockchain/app"
 	"go-blockchain/config"
+	"go-blockchain/core/transaction"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -54,10 +56,62 @@ func (b *Block) Mine(stop <-chan bool, done chan<- bool) (interrupted bool) {
 
 	}
 }
-
 func (b *Block) CalculateMerkleRoot() {
+	switch v := b.Data.(type) {
+	case []transaction.Transaction:
+		b.MerkleRoot = calculateMerkleRootForSliceOfTransaction(v)
+	case string:
+		b.MerkleRoot = calculateMerkleRootForString(v)
+	}
+}
+
+func calculateMerkleRootForString(s string) string {
 	sha := sha256.New()
-	byteArray, _ := json.Marshal(b.Data)
+	byteArray, _ := json.Marshal(s)
 	sha.Write(byteArray)
-	b.MerkleRoot = hex.EncodeToString(sha.Sum(nil))
+	return hex.EncodeToString(sha.Sum(nil))
+}
+
+func calculateMerkleRootForSliceOfTransaction(txn []transaction.Transaction) string {
+	hashes := calculateHashOfTransactions(txn)
+	return MerkleRootFromTransactionHashes(hashes)
+}
+func calculateHashOfTransactions(transactions []transaction.Transaction) []string {
+	var hashes []string
+	for _, transaction := range transactions {
+		str := transaction.Id + transaction.Receiver + transaction.Sender +
+			strconv.FormatFloat(transaction.Amount, 'f', -1, 64) +
+			strconv.FormatFloat(transaction.Fee, 'f', -1, 64)
+		sha := sha256.New()
+		byteArray, _ := json.Marshal(str)
+		sha.Write(byteArray)
+		hashes = append(hashes, hex.EncodeToString(sha.Sum(nil)))
+	}
+	return hashes
+}
+
+func MerkleRootFromTransactionHashes(hashes []string) string {
+	if len(hashes) == 0 {
+		return ""
+	}
+	if len(hashes) == 1 {
+		return hashes[0]
+	}
+	// Process the list by combining each pair of hashes.
+	var newLevel []string
+	for i := 0; i < len(hashes); i += 2 {
+		// If there's an odd number of hashes, duplicate the last one.
+		if i+1 == len(hashes) {
+			newLevel = append(newLevel, CalculateHash(hashes[i], hashes[i]))
+		} else {
+			newLevel = append(newLevel, CalculateHash(hashes[i], hashes[i+1]))
+		}
+	}
+	// Recursively calculate the Merkle root until we reach the top level.
+	return MerkleRootFromTransactionHashes(newLevel)
+}
+
+func CalculateHash(left, right string) string {
+	hash := sha256.Sum256([]byte(left + right))
+	return hex.EncodeToString(hash[:])
 }

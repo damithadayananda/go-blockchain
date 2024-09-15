@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"go-blockchain/config"
 	"go-blockchain/controller"
+	pre_processor "go-blockchain/controller/pre-processor"
 	"go-blockchain/interface/http/api"
 	"go-blockchain/interface/http/ui"
 	"log"
@@ -19,7 +20,9 @@ func InitServer() {
 		&controller.TransactionControllerImpl{},
 		&controller.ChainControllerImpl{},
 		&controller.NodeControllerImpl{},
-		&controller.BlockControllerImpl{})
+		&controller.BlockControllerImpl{
+			PreProcessor: pre_processor.IndexValidator{},
+		})
 	uiHandler := ui.UI{}
 	uiHandler.RegisterUi(mux)
 

@@ -55,14 +55,24 @@ func (n *Node) RemoveNode(url string) error {
 	return n.database.Delete(url)
 }
 
+// implementing gossip protocol
+// once node is initiated it will inform it's existence to known nodes
+// these known nodes will inform their known nodes about newly join node
 func (n *Node) distributeNodeExistence() {
+	myHost := config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port)
+	informedNodes, err := n.GetNodes()
+	if err != nil {
+		return
+	}
+	informedNodes = append(informedNodes, myHost)
 	for _, node := range config.AppConfig.KnownNodes {
 		body, _ := json.Marshal(request.AddNodeRequest{
-			Url: config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port),
+			Url:           config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port),
+			InformedNodes: informedNodes,
 		})
 		req, _ := http.NewRequest(http.MethodPost, node+"/node/add", bytes.NewReader(body))
 		client := http.Client{
-			Timeout: time.Duration(time.Second * time.Duration(config.AppConfig.NodeDistributionTimeOut)),
+			Timeout: time.Second * time.Duration(config.AppConfig.NodeDistributionTimeOut),
 		}
 		res, err := client.Do(req)
 		var data []byte

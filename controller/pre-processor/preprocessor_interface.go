@@ -1,7 +1,7 @@
-package request
+package pre_processor
 
 import "go-blockchain/core/block"
 
-type IValidator interface {
-	ValidateBlock(block *block.Block) error
+type IPreProcessor interface {
+	ProcessBlock(block *block.Block, callerAddress string) (error, []block.Block)
 }

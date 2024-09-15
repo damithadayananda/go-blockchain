@@ -71,7 +71,7 @@ func (minor *minorImp) mine() {
 	}
 	b.CalculateMerkleRoot()
 	interrupted := b.Mine(minor.stopChan, minor.doneChan)
-	minor.chain.AddBlock(&b)
+	minor.chain.AddBlock([]block.Block{b})
 	// since mine function is thread safe
 	// calling marking function here should be fine
 	if !interrupted {

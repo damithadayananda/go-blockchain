@@ -1,21 +1,26 @@
 package request
 
 import (
+	"errors"
 	coreBlock "go-blockchain/core/block"
 	"time"
 )
 
+type BlockRequest struct {
+	Block    Block                  `json:"block"`
+	Metadata map[string]interface{} `json:"metadata"`
+}
 type Block struct {
-	Index        int64
-	Data         interface{}
-	MerkleRoot   string
-	Hash         string
-	PreviousHash string
-	Timestamp    time.Time
-	Nonce        int32
+	Index        int64       `json:"index"`
+	Data         interface{} `json:"data"`
+	MerkleRoot   string      `json:"merkle_root"`
+	Hash         string      `json:"hash"`
+	PreviousHash string      `json:"previous_hash"`
+	Timestamp    time.Time   `json:"timestamp"`
+	Nonce        int32       `json:"nonce"`
 }
 
-func (block Block) ToCoreBlock() (coreBlock.Block, error) {
+func (blockRq BlockRequest) ToCoreBlock() (coreBlock.Block, error) {
 	//TODO here to support multiple data types, future we will implement Type registry
 	//data, ok := block.Data.(transaction.List)
 	//if ok {
@@ -24,12 +29,19 @@ func (block Block) ToCoreBlock() (coreBlock.Block, error) {
 	// instead of this manual copying we can use library like
 	// github.com/jinzhu/copier
 	return coreBlock.Block{
-		Index:        block.Index,
-		Data:         block.Data,
-		Hash:         block.Hash,
-		PreviousHash: block.PreviousHash,
-		Timestamp:    block.Timestamp,
-		Nonce:        block.Nonce,
-		MerkleRoot:   block.MerkleRoot,
+		Index:        blockRq.Block.Index,
+		Data:         blockRq.Block.Data,
+		Hash:         blockRq.Block.Hash,
+		PreviousHash: blockRq.Block.PreviousHash,
+		Timestamp:    blockRq.Block.Timestamp,
+		Nonce:        blockRq.Block.Nonce,
+		MerkleRoot:   blockRq.Block.MerkleRoot,
 	}, nil
+}
+
+func (blockRq BlockRequest) Validate() error {
+	if blockRq.Metadata == nil {
+		return errors.New("block metadata is required")
+	}
+	return nil
 }

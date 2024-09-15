@@ -8,6 +8,6 @@ nodeDistributionTimeOut: 300
 knownNodes:
   - http://localhost:8080
   - http://localhost:8082
-
 ## block
 blockDistributionTimeout: 300
+blockInquiryTimeOut: 30

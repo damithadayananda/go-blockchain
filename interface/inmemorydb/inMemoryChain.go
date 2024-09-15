@@ -1,6 +1,7 @@
 package inmemorydb
 
 import (
+	"errors"
 	"go-blockchain/core/block"
 )
 
@@ -12,12 +13,6 @@ func NewInMemoryChain() *InMemoryChain {
 	return &InMemoryChain{}
 }
 func (chain *InMemoryChain) Save(value block.Block) error {
-	if len(chain.blocks) == 0 {
-		value.Index = 1
-		chain.blocks = append(chain.blocks, value)
-		return nil
-	}
-	value.Index += chain.blocks[len(chain.blocks)-1].Index // increasing the index
 	chain.blocks = append(chain.blocks, value)
 	return nil
 }
@@ -31,4 +26,15 @@ func (chain *InMemoryChain) GetLastBlock() (block.Block, error) {
 		return block.Block{}, nil
 	}
 	return chain.blocks[len(chain.blocks)-1], nil
+}
+
+func (chain *InMemoryChain) GetBlocks(numOfBlocks int) ([]block.Block, error) {
+	if len(chain.blocks) < numOfBlocks {
+		return nil, errors.New("chain length is less than the number of requested blocks")
+	}
+	return chain.blocks[:numOfBlocks], nil
+}
+
+func (chain *InMemoryChain) UpdateLastBlock(block block.Block) {
+	chain.blocks[len(chain.blocks)-1] = block
 }
