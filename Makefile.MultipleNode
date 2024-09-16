@@ -1,0 +1,26 @@
+GO_VERSION_REQ=1.18.0
+OUTPUT_BINARY_1=node-01
+OUTPUT_BINARY_2=node-02
+OUTPUT_BINARY_3=node-03
+
+check-go-version:
+	@echo "Checking Go version..."
+	@CURRENT_GO_VERSION=$(shell go version | awk '{print $$3}' | cut -d'o' -f2) && \
+	if [ "$$(printf '%s\n' "$(GO_VERSION_REQ)" "$${CURRENT_GO_VERSION}" | sort -V | head -n1)" != "$(GO_VERSION_REQ)" ]; then \
+		echo "Go version must be higher than $(GO_VERSION_REQ). Current version: $${CURRENT_GO_VERSION}"; \
+		exit 1; \
+	fi
+
+build:
+	@echo "Building the Go project..."
+	go build -o $(OUTPUT_BINARY_1)
+	go build -o $(OUTPUT_BINARY_2)
+	go build -o $(OUTPUT_BINARY_3)
+
+run:
+	@echo "Running the binaries with different config files..."
+	@CONFIG_PATH=./config/config_1.yml ./$(OUTPUT_BINARY_1) & \
+	CONFIG_PATH=./config/config_2.yml ./$(OUTPUT_BINARY_2) & \
+	CONFIG_PATH=./config/config_3.yml ./$(OUTPUT_BINARY_3)
+
+build-multiple-node: check-go-version build run

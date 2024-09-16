@@ -1,3 +1,4 @@
+# ######## building ui ##########
 # Define the UI folder path
 UI_PATH=./ui/frontend/go-blockchain
 
@@ -8,7 +9,7 @@ MIN_NODE_VERSION=14
 # Check for react-scripts availability
 CHECK_REACT_SCRIPTS=$(shell npm list -g | grep react-scripts || true)
 
-all: check_node_version check_react_scripts build
+all: check_node_version check_react_scripts ui-build
 
 # Check if Node.js version is >= 14.0
 check_node_version:
@@ -28,3 +29,6 @@ check_react_scripts:
 ui-build:
 	@echo "Switching to UI folder: $(UI_PATH)"
 	cd $(UI_PATH) && npm install && npm run build && npm start
+
+
+# ###### end build ui #########

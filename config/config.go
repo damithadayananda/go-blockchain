@@ -22,7 +22,7 @@ func InitConfig() {
 	configPath := os.Getenv("CONFIG_PATH")
 	b, e := os.ReadFile(configPath)
 	if e != nil {
-		panic(e)
+		panic(configPath)
 	}
 	if err := yaml.Unmarshal(b, &AppConfig); err != nil {
 		panic(err)
