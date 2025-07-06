@@ -16,3 +16,6 @@ blockchain written in go for educational purpose
 # check service running
 1. visit http://localhost:8080/chain
 2. if build ui make target is already executed visit http://localhost:3000/
+
+# unit test 
+run the shell scrip inside scripts directory `./unit-test.sh`

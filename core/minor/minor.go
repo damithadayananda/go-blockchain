@@ -20,9 +20,9 @@ type minorImp struct {
 	chain               blockchain.BlockChainInterface
 }
 
-func NewMinor() {
+func NewMinor(memPool *mempool.MemPool) {
 	minor := minorImp{
-		memPool:  *mempool.Mempool,
+		memPool:  *memPool,
 		stopChan: make(chan bool),
 		doneChan: make(chan bool),
 		chain:    blockchain.Chain,

@@ -17,6 +17,13 @@ type TransactionController interface {
 }
 
 type TransactionControllerImpl struct {
+	MemPool mempool.MemPoolInterface
+}
+
+func NewTransactionController(mPool mempool.MemPoolInterface) TransactionController {
+	return &TransactionControllerImpl{
+		MemPool: mPool,
+	}
 }
 
 func (cr *TransactionControllerImpl) AddTransaction(r *http.Request) interface{} {
@@ -39,7 +46,7 @@ func (cr *TransactionControllerImpl) AddTransaction(r *http.Request) interface{}
 		Fee:      txnRequest.Fee,
 	})
 	txn.SetMiningStatus(domain.READY_FOR_MINING)
-	mempool.Mempool.Save(txn)
+	cr.MemPool.Save(txn)
 	return response.SuccessResponse{
 		BaseResponse: response.BaseResponse{
 			Success: true,

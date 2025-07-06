@@ -13,7 +13,7 @@ func TestCalculateHash(t *testing.T) {
 	bc := BlockChain{}
 	b := block.Block{
 		Index: 0,
-		Data: transaction.List([]transaction.Transaction{
+		Data: []transaction.Transaction{
 			transaction.Transaction{
 				Id:           "504e914d-0b23-4091-a8d4-ba047cc67cc9",
 				Amount:       300,
@@ -32,10 +32,13 @@ func TestCalculateHash(t *testing.T) {
 				Size:         0,
 				MiningStatus: 0,
 			},
-		}),
+		},
 		PreviousHash: "0001bf18bbd4a96f764a2b4d91a9e5923d9510ace2a595150c374f0133efbdab",
-		Nonce:        6166,
 	}
+	stop := make(chan bool)
+	done := make(chan bool)
+	go b.Mine(stop, done)
+	<-done
 	valid := bc.validateHashComplexity(bc.calculateHash(b))
 	assert.True(t, valid)
 }

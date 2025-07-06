@@ -13,11 +13,11 @@ import (
 	"net/http"
 )
 
-func InitServer() {
+func InitServer(txnCtrl controller.TransactionController) {
 	mux := mux.NewRouter()
 	apiHandler := api.API{}
 	apiHandler.RegisterAPI(mux,
-		&controller.TransactionControllerImpl{},
+		txnCtrl,
 		&controller.ChainControllerImpl{},
 		&controller.NodeControllerImpl{},
 		&controller.BlockControllerImpl{

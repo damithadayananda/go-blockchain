@@ -14,12 +14,13 @@ type MemPool struct {
 	Remover  chan []string
 }
 
-func NewMemPool(database persistant.MemPoolInterface) {
+func NewMemPool(database persistant.MemPoolInterface) *MemPool {
 	Mempool = &MemPool{
 		Receiver: make(chan bool),
 		Remover:  make(chan []string),
 		database: database,
 	}
+	return Mempool
 }
 
 func (m MemPool) Save(transaction transaction.Transaction) error {
