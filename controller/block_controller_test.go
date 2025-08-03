@@ -45,6 +45,10 @@ func (m MockBlockChain) GetBlocks(noOfBlocks int) ([]coreBlock.Block, error) {
 	panic("implement me")
 }
 
+func (m MockBlockChain) SyncBlocks(blocks []coreBlock.Block) error {
+	return nil
+}
+
 // Define a mock PreProcessor struct
 type MockPreProcessor struct {
 	ProcessBlockFunc func(block *coreBlock.Block, callerAddress string) (error, []coreBlock.Block)

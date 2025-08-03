@@ -1,7 +1,11 @@
 package persistant
 
+import (
+	"go-blockchain/domain"
+)
+
 type NodeDBInterface interface {
-	Save(ip string) error
-	GetAll() ([]string, error)
+	Save(node domain.Node) error
+	GetAll() ([]domain.Node, error)
 	Delete(ip string) error
 }

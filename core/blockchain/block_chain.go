@@ -10,9 +10,14 @@ import (
 	"go-blockchain/config"
 	"go-blockchain/controller/request"
 	"go-blockchain/core/block"
+	"go-blockchain/core/interface/http/response"
 	"go-blockchain/core/node"
 	"go-blockchain/core/persistant"
+	"go-blockchain/core/transaction"
+	"go-blockchain/domain"
+	"go-blockchain/util"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -29,17 +34,44 @@ func NewBlockChain(database persistant.BlockChainDBInterface) {
 	ch := BlockChain{
 		database: database,
 	}
-	genesisBlock := block.Block{
-		Data:         "Genesis Block",
-		PreviousHash: "",
-		Timestamp:    time.Now(),
+	//only genesis node will create genesis block
+	if config.AppConfig.InGenesis {
+		initialTransaction := transaction.NewTransaction(transaction.Transaction{
+			Amount:   50, //this is the first coinbase transaction
+			Receiver: app.App.Address,
+		})
+		genesisBlock := block.Block{
+			Data:         []transaction.Transaction{initialTransaction},
+			PreviousHash: "",
+			Timestamp:    time.Now(),
+		}
+		genesisBlock.CalculateMerkleRoot()
+		done := make(chan bool)
+		go genesisBlock.Mine(nil, done)
+		<-done
+		close(done)
+		ch.AddBlock([]block.Block{genesisBlock})
+	} else {
+		//syncing with existing blocks
+		for _, node := range config.AppConfig.KnownNodes {
+			client := util.GeHttpsClient(node.Certificate)
+			res, err := client.Get(node.Ip + "/chain")
+			if err != nil {
+				log.Printf("Error in reaching Know node: %v\n", err)
+				continue
+			}
+			data, _ := io.ReadAll(res.Body)
+			var chain response.ChainResponse
+			err = json.Unmarshal(data, &chain)
+			if err != nil {
+				continue
+			}
+			if err = ch.SyncBlocks(chain.Result); err != nil {
+				log.Fatal("Error in syncing with main chain")
+			}
+			break
+		}
 	}
-	genesisBlock.CalculateMerkleRoot()
-	done := make(chan bool)
-	go genesisBlock.Mine(nil, done)
-	<-done
-	close(done)
-	ch.AddBlock([]block.Block{genesisBlock})
 	Chain = &ch
 }
 
@@ -124,10 +156,9 @@ func (c *BlockChain) DistributeBlock(block *block.Block) error {
 			},
 		}
 		body, _ := json.Marshal(reqBody)
-		req, _ := http.NewRequest(http.MethodPost, node+"/block/add", bytes.NewBuffer(body))
-		client := &http.Client{
-			Timeout: time.Second * time.Duration(config.AppConfig.BlockDistributionTimeOut),
-		}
+		req, _ := http.NewRequest(http.MethodPost, node.Ip+"/block/add", bytes.NewBuffer(body))
+		client := util.GeHttpsClient(node.Certificate)
+		client.Timeout = time.Second * time.Duration(config.AppConfig.BlockDistributionTimeOut)
 		res, err := client.Do(req)
 		var data []byte
 		if res != nil {
@@ -143,17 +174,22 @@ func (c *BlockChain) GetBlocks(noOfBlocks int) ([]block.Block, error) {
 	return c.database.GetBlocks(noOfBlocks)
 }
 
-func (c *BlockChain) getNodesToBeInformed() ([]string, error) {
+func (c *BlockChain) getNodesToBeInformed() ([]domain.Node, error) {
 	knownNodes, err := node.NodeRef.GetNodes()
 	if err != nil {
 		return nil, err
 	}
-	var list []string
+	var list []domain.Node
 	for _, knownNode := range knownNodes {
-		if knownNode == (config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port)) {
+		if knownNode.Ip == (config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port)) {
 			continue
 		}
 		list = append(list, knownNode)
 	}
 	return list, nil
+}
+
+func (c *BlockChain) SyncBlocks(blocks []block.Block) error {
+	c.database.Sync(blocks)
+	return nil
 }

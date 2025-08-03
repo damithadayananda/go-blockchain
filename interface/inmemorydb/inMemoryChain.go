@@ -38,3 +38,8 @@ func (chain *InMemoryChain) GetBlocks(numOfBlocks int) ([]block.Block, error) {
 func (chain *InMemoryChain) UpdateLastBlock(block block.Block) {
 	chain.blocks[len(chain.blocks)-1] = block
 }
+
+func (chain *InMemoryChain) Sync(blocks []block.Block) error {
+	chain.blocks = append(chain.blocks, blocks...)
+	return nil
+}

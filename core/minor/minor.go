@@ -63,6 +63,16 @@ func (minor *minorImp) mine() {
 		minor.isInMining = false
 		return
 	}
+	//Adding self transaction, summation of fee
+	var fee = float64(0)
+	for _, tx := range txn {
+		fee = fee + tx.Fee
+	}
+	txn = append(txn, transaction.NewTransaction(transaction.Transaction{
+		Amount:   fee,
+		Receiver: app.App.Address,
+	}))
+
 	pb, _ := minor.chain.GetLastBlock()
 	b := block.Block{
 		Data:         txn,

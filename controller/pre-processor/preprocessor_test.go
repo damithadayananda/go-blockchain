@@ -116,3 +116,7 @@ func (mockChain) DistributeBlock(block *coreBlock.Block) error {
 func (mockChain) GetBlocks(noOfBlocks int) ([]coreBlock.Block, error) {
 	return nil, nil
 }
+
+func (mockChain) SyncBlocks(blocks []coreBlock.Block) error {
+	return nil
+}

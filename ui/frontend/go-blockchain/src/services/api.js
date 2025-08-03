@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/chain';
-const TRANSACTION_URL = 'http://localhost:8080/transaction';
-const NODE_URL = 'http://localhost:8080/node/get';
+const API_URL = 'https://localhost:8080/chain';
+const TRANSACTION_URL = 'https://localhost:8080/transaction';
+const NODE_URL = 'https://localhost:8080/node/get';
 
 
 export const fetchChain = async () => {

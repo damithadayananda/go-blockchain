@@ -2,5 +2,11 @@ package response
 
 type NodeResponse struct {
 	SuccessResponse
-	Result []string `json:"result"`
+	Result []Node `json:"result"`
+}
+
+type Node struct {
+	Ip          string
+	Certificate []byte
+	Address     string
 }

@@ -8,7 +8,10 @@ import (
 	"go-blockchain/config"
 	"go-blockchain/controller/request"
 	"go-blockchain/core/persistant"
+	"go-blockchain/domain"
+	"go-blockchain/util"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -26,28 +29,37 @@ func NewNode(database persistant.NodeDBInterface) {
 	}
 	// Adding known nodes from config
 	for _, node := range config.AppConfig.KnownNodes {
-		database.Save(node)
+		cert, err := ioutil.ReadFile(node.CertificatePath)
+		if err != nil {
+			app.Logger.Error.Log("Error Reading Certificate: %v", err)
+			return
+		}
+		database.Save(domain.Node{
+			Ip:          node.Ip,
+			Certificate: cert,
+			Address:     node.Address,
+		})
 	}
 	// distribute details to the cluster
 	NodeRef.distributeNodeExistence()
 }
 
-func (n *Node) SaveNode(url string) error {
+func (n *Node) SaveNode(node domain.Node) error {
 	//avoid duplicate node details
 	data, err := n.database.GetAll()
 	if err != nil {
 		return err
 	}
 	for _, v := range data {
-		if v == url {
+		if v.Ip == node.Ip {
 			return nil
 		}
 	}
 	//saving new node
-	return n.database.Save(url)
+	return n.database.Save(node)
 }
 
-func (n *Node) GetNodes() ([]string, error) {
+func (n *Node) GetNodes() ([]domain.Node, error) {
 	return n.database.GetAll()
 }
 
@@ -60,20 +72,23 @@ func (n *Node) RemoveNode(url string) error {
 // these known nodes will inform their known nodes about newly join node
 func (n *Node) distributeNodeExistence() {
 	myHost := config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port)
+	certificate := app.App.Certificate
 	informedNodes, err := n.GetNodes()
 	if err != nil {
 		return
 	}
-	informedNodes = append(informedNodes, myHost)
+	informedNodes = append(informedNodes, domain.Node{
+		Ip:          myHost,
+		Certificate: certificate,
+	})
 	for _, node := range config.AppConfig.KnownNodes {
 		body, _ := json.Marshal(request.AddNodeRequest{
 			Url:           config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port),
 			InformedNodes: informedNodes,
 		})
-		req, _ := http.NewRequest(http.MethodPost, node+"/node/add", bytes.NewReader(body))
-		client := http.Client{
-			Timeout: time.Second * time.Duration(config.AppConfig.NodeDistributionTimeOut),
-		}
+		req, _ := http.NewRequest(http.MethodPost, node.Ip+"/node/add", bytes.NewReader(body))
+		client := util.GeHttpsClient(node.Certificate)
+		client.Timeout = time.Second * time.Duration(config.AppConfig.NodeDistributionTimeOut)
 		res, err := client.Do(req)
 		var data []byte
 		if res != nil {

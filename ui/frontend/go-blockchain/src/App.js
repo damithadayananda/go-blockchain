@@ -78,7 +78,7 @@ const App = () => {
                     <List sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}>
                         {nodes.map((node, index) => (
                             <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
-                                <ListItemText primary={node} sx={{ color: '#424242' }} />
+                                <ListItemText primary={node.Ip} sx={{ color: '#424242' }} />
                             </ListItem>
                         ))}
                     </List>

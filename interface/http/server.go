@@ -32,7 +32,10 @@ func InitServer(txnCtrl controller.TransactionController) {
 	corsHeaders := handlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
 	handler := handlers.CORS(corsOptions, corsMethods, corsHeaders)(mux)
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", config.AppConfig.Port), handler); err != nil {
+	if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", config.AppConfig.Port),
+		fmt.Sprintf("%v/cert.pem", config.AppConfig.SecretDir),
+		fmt.Sprintf("%v/key.pem", config.AppConfig.SecretDir),
+		handler); err != nil {
 		log.Fatalf(err.Error())
 	}
 }

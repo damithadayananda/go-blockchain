@@ -11,4 +11,5 @@ type BlockChainInterface interface {
 	GetLastBlock() (block.Block, error)
 	DistributeBlock(block *block.Block) error
 	GetBlocks(noOfBlocks int) ([]block.Block, error)
+	SyncBlocks(blocks []block.Block) error
 }

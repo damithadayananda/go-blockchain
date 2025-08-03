@@ -13,6 +13,7 @@ type logger struct {
 	Warn  log.Logger
 	Info  log.Logger
 	Trace log.Logger
+	Fatal func(...interface{})
 }
 
 func init() {
@@ -23,6 +24,10 @@ func init() {
 		Warn:  level.Warn(baseLogger),
 		Info:  level.Info(baseLogger),
 		Trace: level.Debug(baseLogger),
+		Fatal: func(val ...interface{}) {
+			level.Error(baseLogger).Log(val)
+			os.Exit(1)
+		},
 	}
 	Logger = logger
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-blockchain/app"
 	"go-blockchain/config"
 	"go-blockchain/controller"
 	"go-blockchain/core/blockchain"
@@ -14,6 +15,8 @@ import (
 func main() {
 	//initializing configuration
 	config.InitConfig()
+	//initializing application
+	app.NewApplication()
 	//initializing chain db
 	chainDb := inmemorydb.NewInMemoryChain()
 	//initializing blockchain

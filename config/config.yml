@@ -2,13 +2,17 @@ complexity: 3
 maxTransactionsPerBlock: 2
 
 ## node
-host: http://localhost
+host: https://localhost
 port: 8081
 nodeDistributionTimeOut: 30
 knownNodes:
-  - http://localhost:8081
-  - http://localhost:8082
+  - https://localhost:8081
+  - https://localhost:8082
 
 ## block
 blockDistributionTimeout: 30
 blockInquiryTimeOut: 30
+secretDir: secrets
+
+## genesis
+inGenesis: true
