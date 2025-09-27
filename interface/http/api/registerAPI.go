@@ -28,8 +28,14 @@ func (api *API) RegisterAPI(mux *mux.Router,
 		data, _ := json.Marshal(api.chainController.GetChain())
 		w.Write(data)
 	})
-	mux.HandleFunc("/transaction", func(w http.ResponseWriter, r *http.Request) {
+
+	txn := mux.PathPrefix("/transaction").Subrouter()
+	txn.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
 		data, _ := json.Marshal(api.transactionController.AddTransaction(r))
+		w.Write(data)
+	})
+	txn.HandleFunc("/get/mempool", func(w http.ResponseWriter, r *http.Request) {
+		data, _ := json.Marshal(api.transactionController.GetMemPoolTransactions(r))
 		w.Write(data)
 	})
 
@@ -40,7 +46,8 @@ func (api *API) RegisterAPI(mux *mux.Router,
 		w.Write(data)
 	})
 	node.HandleFunc("/get", func(w http.ResponseWriter, r *http.Request) {
-		data, _ := json.Marshal(api.nodeController.GetNode(r))
+		nodeData := api.nodeController.GetNode(r)
+		data, _ := json.Marshal(nodeData)
 		w.Write(data)
 	})
 

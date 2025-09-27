@@ -7,4 +7,5 @@ type MemPoolInterface interface {
 	Get() ([]transaction.Transaction, error)
 	Delete(ids []string) error
 	Mark(transactions []transaction.Transaction) error
+	GetAll() ([]transaction.Transaction, error)
 }

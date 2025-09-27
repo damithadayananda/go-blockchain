@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const API_URL = 'https://localhost:8080/chain';
-const TRANSACTION_URL = 'https://localhost:8080/transaction';
+const TRANSACTION_URL = 'https://localhost:8080/transaction/add';
 const NODE_URL = 'https://localhost:8080/node/get';
+const MEMPOOL_URL = 'https://localhost:8080/transaction/get/mempool';
 
 
 export const fetchChain = async () => {
@@ -27,4 +28,9 @@ export const submitTransaction = async (transaction) => {
         console.error("Error submitting the transaction:", error);
         throw error;
     }
+};
+
+export const fetchTransactions = async () => {
+    const response = await axios.get(MEMPOOL_URL);
+    return response.data.Result;
 };

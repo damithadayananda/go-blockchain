@@ -35,6 +35,10 @@ func (m MockMemPool) Mark(transactions []transaction.Transaction) error {
 	panic("implement me")
 }
 
+func (m MockMemPool) GetAll() ([]transaction.Transaction, error) {
+	panic("implement me")
+}
+
 func TestAddTransactionSuccess(t *testing.T) {
 	txnCtrl := NewTransactionController(MockMemPool{
 		SaveMock: func(transaction transaction.Transaction) error {

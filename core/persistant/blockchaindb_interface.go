@@ -11,4 +11,5 @@ type BlockChainDBInterface interface {
 	GetBlocks(numOfBlocks int) ([]block.Block, error)
 	UpdateLastBlock(block block.Block)
 	Sync(block []block.Block) error
+	UpdateBlockInGivenIndex(blk block.Block, index int) (err error)
 }

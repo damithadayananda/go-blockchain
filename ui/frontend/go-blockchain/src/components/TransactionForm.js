@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {Box, Button, TextField} from "@mui/material";
+import { v4 as uuid } from 'uuid';
 
 const TransactionForm = ({ onSubmit }) => {
     const [amount, setAmount] = useState('');
@@ -9,7 +10,7 @@ const TransactionForm = ({ onSubmit }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit({ amount: parseFloat(amount), receiver, sender, fee: parseFloat(fee)});
+        onSubmit({ amount: parseFloat(amount), receiver, sender, fee: parseFloat(fee), address: uuid() });
         setAmount('');
         setReceiver('');
         setSender('');
@@ -17,7 +18,7 @@ const TransactionForm = ({ onSubmit }) => {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2}}>
             <TextField
                 label="Amount"
                 variant="outlined"
@@ -25,6 +26,7 @@ const TransactionForm = ({ onSubmit }) => {
                 onChange={(e) => setAmount(e.target.value)}
                 type="number"
                 required
+                sx={{backgroundColor: 'rgba(255, 255, 255, 0.5)'}}
             />
             <TextField
                 label="Receiver"
@@ -32,6 +34,7 @@ const TransactionForm = ({ onSubmit }) => {
                 value={receiver}
                 onChange={(e) => setReceiver(e.target.value)}
                 required
+                sx={{backgroundColor: 'rgba(255, 255, 255, 0.5)'}}
             />
             <TextField
                 label="Sender"
@@ -39,6 +42,7 @@ const TransactionForm = ({ onSubmit }) => {
                 value={sender}
                 onChange={(e) => setSender(e.target.value)}
                 required
+                sx={{backgroundColor: 'rgba(255, 255, 255, 0.5)'}}
             />
             <TextField
                 label="Fee"
@@ -47,6 +51,7 @@ const TransactionForm = ({ onSubmit }) => {
                 onChange={(e) => setFee(e.target.value)}
                 type="number"
                 required
+                sx={{backgroundColor: 'rgba(255, 255, 255, 0.5)'}}
             />
             <Button variant="contained" color="primary" type="submit">
                 Submit Transaction

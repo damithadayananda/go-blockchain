@@ -10,6 +10,7 @@ import (
 	"go-blockchain/core/node"
 	"go-blockchain/interface/http"
 	"go-blockchain/interface/inmemorydb"
+	"go-blockchain/service"
 )
 
 func main() {
@@ -31,8 +32,10 @@ func main() {
 	nodeDb := inmemorydb.NewInMemoryNode()
 	//initializing node
 	node.NewNode(nodeDb)
+	//services
+	txnService := service.NewTransactionService(memPoolRef)
 	//controllers
-	txnCtrl := controller.NewTransactionController(memPoolRef)
+	txnCtrl := controller.NewTransactionController(memPoolRef, txnService)
 	//initializing http server
 	http.InitServer(txnCtrl)
 }

@@ -14,7 +14,8 @@ type InMemoryMemPool struct {
 }
 
 func NewInMemoryMemPool() *InMemoryMemPool {
-	return &InMemoryMemPool{}
+	txnMemPool := &InMemoryMemPool{}
+	return txnMemPool
 }
 func (im *InMemoryMemPool) Save(transaction transaction.Transaction) error {
 	im.lock.Lock()
@@ -65,9 +66,10 @@ func (im *InMemoryMemPool) Delete(id string) {
 func (im *InMemoryMemPool) MiningStatusUpdate(id string, status domain.MiningStates) error {
 	im.lock.Lock()
 	defer im.lock.Unlock()
-	for _, v := range im.mempool {
+	for k, v := range im.mempool {
 		if v.Id == id {
 			v.MiningStatus = status
+			im.mempool[k] = v
 		}
 	}
 	return nil

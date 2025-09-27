@@ -8,6 +8,7 @@ import (
 	"go-blockchain/controller/response"
 	coreBlock "go-blockchain/core/block"
 	"go-blockchain/core/blockchain"
+	"go-blockchain/core/transaction"
 	"io"
 	"net/http"
 	"time"
@@ -27,6 +28,12 @@ func (iv IndexValidator) ProcessBlock(block *coreBlock.Block, callerAddress stri
 		existingDataLength := getLengthOfData(latestBlock.Data)
 		newDataLength := getLengthOfData(block.Data)
 		if existingDataLength < newDataLength {
+			return nil, []coreBlock.Block{*block}
+		} else if existingDataLength == newDataLength {
+			if block.Nonce >= latestBlock.Nonce {
+				//here length also equal lower nonce going to stay
+				return errors.New("identical blocks exists, least effort will proceed"), nil
+			}
 			return nil, []coreBlock.Block{*block}
 		}
 		return errors.New("existing or outdated block"), nil
@@ -66,6 +73,8 @@ func (iv IndexValidator) ProcessBlock(block *coreBlock.Block, callerAddress stri
 func getLengthOfData(data interface{}) int {
 	switch v := data.(type) {
 	case []interface{}:
+		return len(v)
+	case []transaction.Transaction:
 		return len(v)
 	case string:
 		return len(v)

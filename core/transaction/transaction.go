@@ -32,8 +32,11 @@ func NewTransaction(request Transaction) Transaction {
 		Receiver: request.Receiver,
 		Sender:   request.Sender,
 		Fee:      request.Fee,
+		Id:       request.Id,
 	}
-	transaction.generateId()
+	if request.Id == "" {
+		transaction.generateId()
+	}
 	transaction.generateSize()
 	return transaction
 }

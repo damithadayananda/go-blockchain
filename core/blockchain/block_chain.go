@@ -80,9 +80,20 @@ func (c *BlockChain) GetChain() ([]block.Block, error) {
 }
 
 func (c *BlockChain) AddBlock(block []block.Block) error {
+	// need to handle new block with same index
+	// need to overide the existing block
 	for _, blk := range block {
 		previousBlock, _ := c.database.GetLastBlock()
 		if previousBlock.Index != 0 { // just to avoid genesis block going through the validations
+			if previousBlock.Index == blk.Index {
+				//we are coming here because even this is conflict, visiting block needs to get priority
+				//so exising block will be replaced with new one
+				//need to add hash validation also here
+				c.database.UpdateBlockInGivenIndex(blk, int(blk.Index-1))
+				c.DistributeBlock(&blk)
+				continue
+			}
+
 			//this golden check helps to stop chain of block add calls
 			//between entire cluster
 			if previousBlock.Hash == blk.PreviousHash {

@@ -12,7 +12,7 @@ import (
 
 type minorImp struct {
 	isInMining          bool
-	memPool             mempool.MemPool
+	memPool             *mempool.MemPool
 	transactionOnMining []transaction.Transaction
 	mineLock            sync.Mutex
 	stopChan            chan bool
@@ -22,7 +22,7 @@ type minorImp struct {
 
 func NewMinor(memPool *mempool.MemPool) {
 	minor := minorImp{
-		memPool:  *memPool,
+		memPool:  memPool,
 		stopChan: make(chan bool),
 		doneChan: make(chan bool),
 		chain:    blockchain.Chain,

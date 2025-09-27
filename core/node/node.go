@@ -85,6 +85,8 @@ func (n *Node) distributeNodeExistence() {
 		body, _ := json.Marshal(request.AddNodeRequest{
 			Url:           config.AppConfig.Host + ":" + strconv.Itoa(config.AppConfig.Port),
 			InformedNodes: informedNodes,
+			Certificate:   certificate,
+			Address:       app.App.Address,
 		})
 		req, _ := http.NewRequest(http.MethodPost, node.Ip+"/node/add", bytes.NewReader(body))
 		client := util.GeHttpsClient(node.Certificate)

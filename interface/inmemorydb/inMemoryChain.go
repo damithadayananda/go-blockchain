@@ -43,3 +43,8 @@ func (chain *InMemoryChain) Sync(blocks []block.Block) error {
 	chain.blocks = append(chain.blocks, blocks...)
 	return nil
 }
+
+func (chain *InMemoryChain) UpdateBlockInGivenIndex(blk block.Block, index int) (err error) {
+	chain.blocks[index] = blk
+	return nil
+}

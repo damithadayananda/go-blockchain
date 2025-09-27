@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Block from './components/Block';
 import TransactionForm from './components/TransactionForm';
-import {fetchChain, fetchNodes, submitTransaction} from './services/api';
+import NodeList from "./components/NodeList";
+import BlockchainBackground from "./components/Background";
+import Transaction from "./components/Transaction";
+import {fetchChain, fetchNodes, submitTransaction, fetchTransactions} from './services/api';
 import './App.css';
 import {Box, Button, Container, List, ListItem, ListItemText, Typography} from "@mui/material";
 
@@ -10,6 +13,7 @@ const App = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [nodes, setNodes] = useState([]);
+    const [transactions, setTransactions] = useState([]);
 
 
     const getChain = async () => {
@@ -34,6 +38,15 @@ const App = () => {
         }
     };
 
+    const getTransactions = async () => {
+        try {
+            const data = await fetchTransactions();
+            setTransactions(data);
+        } catch (error) {
+            setError("Error fetching the transactions data.");
+        }
+    };
+
     useEffect(() => {
         getChain();
     }, []);
@@ -42,10 +55,14 @@ const App = () => {
         getNodes();
     }, []);
 
+    useEffect(() => {
+        getTransactions();
+    }, [])
+
     const handleTransactionSubmit = async (transaction) => {
         try {
             await submitTransaction(transaction);
-            await getChain();
+            await Promise.all([getChain(), getTransactions()]);
         } catch (error) {
             setError("Error submitting the transaction.");
         }
@@ -55,34 +72,35 @@ const App = () => {
     if (error) return <div>{error}</div>;
 
     return (
-        <Container className="app" sx={{ display: 'flex', height: '100vh' }}>
-            <Box className="column column-3-4" sx={{ flexGrow: 1, flexShrink: 1, marginRight: 2 }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>Blockchain Data</Typography>
+        <Container className="app" sx={{ display: 'flex', height: '100vh', position: "relative" }}>
+            <BlockchainBackground/>
+            <Box className="column column-3-4" sx={{ flexGrow: 1, flexShrink: 1, marginRight: 2 , position: "relative", zIndex: 1}}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                        Blocks
+                    </Typography>
+                    <Button variant="contained" color="primary" onClick={getChain}>
+                        RE SYNC
+                    </Button>
+                </Box>
                 {blocks.map((block, index) => (
                     <Block key={index} block={block} />
                 ))}
-            </Box>
-            <Box className="column column-1-4" sx={{ width: '25%', minWidth: 250, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box className="row row-1-2" sx={{ flex: 0 }}>
-                    <Button variant="contained" color="primary" onClick={getChain}>
-                        GET CHAIN
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, mt: 4 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                        Mempool Transactions
+                    </Typography>
+                    <Button variant="contained" color="primary" onClick={getTransactions}>
+                        REFRESH
                     </Button>
                 </Box>
-                <Box className="row row-1-2" sx={{ flex: 0 }}>
+                <Transaction transactions={transactions} />
+            </Box>
+            <Box className="column column-1-4" sx={{ width: '25%', minWidth: 250, display: 'flex', flexDirection: 'column', gap: 2, position: "relative", zIndex: 1  }}>
+                <Box className="row row-1-2" sx={{ flex: 0, position: "relative", zIndex: 2 }}>
                     <TransactionForm onSubmit={handleTransactionSubmit} />
                 </Box>
-                <Box className="row row-1-2" sx={{ flex: 0, flexDirection: 'column', alignItems: 'flex-start' }}>
-                    <Typography variant="h5" sx={{ color: '#1976d2', fontWeight: 'bold', marginBottom: 2 }}>
-                        Available Nodes
-                    </Typography>
-                    <List sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}>
-                        {nodes.map((node, index) => (
-                            <ListItem key={index} sx={{ borderBottom: '1px solid #e0e0e0' }}>
-                                <ListItemText primary={node.Ip} sx={{ color: '#424242' }} />
-                            </ListItem>
-                        ))}
-                    </List>
-                </Box>
+                <NodeList nodes={nodes}/>
             </Box>
         </Container>
     );

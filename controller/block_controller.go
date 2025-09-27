@@ -12,6 +12,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type BlockController interface {
@@ -24,6 +25,7 @@ type BlockControllerImpl struct {
 }
 
 func (bc BlockControllerImpl) AddBlock(r *http.Request) interface{} {
+	time.Sleep(time.Duration(5) * time.Second)
 	reqBody, _ := io.ReadAll(r.Body)
 	addBlockReq := request.BlockRequest{}
 	if err := json.Unmarshal(reqBody, &addBlockReq); err != nil {

@@ -56,6 +56,9 @@ func (b *Block) Mine(stop <-chan bool, done chan<- bool) (interrupted bool) {
 
 	}
 }
+
+// CalculateMerkleRoot
+// Merkle root calculation logic needs to improve based on new types
 func (b *Block) CalculateMerkleRoot() {
 	switch v := b.Data.(type) {
 	case []transaction.Transaction:

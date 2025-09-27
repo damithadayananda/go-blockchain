@@ -23,7 +23,7 @@ func NewMemPool(database persistant.MemPoolInterface) *MemPool {
 	return Mempool
 }
 
-func (m MemPool) Save(transaction transaction.Transaction) error {
+func (m *MemPool) Save(transaction transaction.Transaction) error {
 	err := m.database.Save(transaction)
 	if err != nil {
 		return err
@@ -32,11 +32,11 @@ func (m MemPool) Save(transaction transaction.Transaction) error {
 	return nil
 }
 
-func (m MemPool) Get() ([]transaction.Transaction, error) {
+func (m *MemPool) Get() ([]transaction.Transaction, error) {
 	return m.database.Get()
 }
 
-func (m MemPool) Delete(ids []string) error {
+func (m *MemPool) Delete(ids []string) error {
 	for _, id := range ids {
 		m.database.Delete(id)
 	}
@@ -44,9 +44,13 @@ func (m MemPool) Delete(ids []string) error {
 	return nil
 }
 
-func (m MemPool) Mark(transactions []transaction.Transaction) error {
+func (m *MemPool) Mark(transactions []transaction.Transaction) error {
 	for _, txn := range transactions {
 		m.database.MiningStatusUpdate(txn.Id, domain.MINING_DONE)
 	}
 	return nil
+}
+
+func (m *MemPool) GetAll() ([]transaction.Transaction, error) {
+	return m.database.GetAll(), nil
 }
