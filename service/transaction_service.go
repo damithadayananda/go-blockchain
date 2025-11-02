@@ -10,7 +10,9 @@ import (
 	"go-blockchain/core/blockchain"
 	"go-blockchain/core/mempool"
 	"go-blockchain/core/node"
+	"go-blockchain/core/persistant"
 	"go-blockchain/core/transaction"
+	"go-blockchain/domain"
 	"go-blockchain/util"
 	"io"
 	"net/http"
@@ -19,11 +21,13 @@ import (
 
 type TransactionService struct {
 	MemPool mempool.MemPoolInterface
+	NodeDb  persistant.NodeDBInterface
 }
 
-func NewTransactionService(mPool mempool.MemPoolInterface) TransactionService {
+func NewTransactionService(mPool mempool.MemPoolInterface, nodeDb persistant.NodeDBInterface) TransactionService {
 	return TransactionService{
 		MemPool: mPool,
+		NodeDb:  nodeDb,
 	}
 }
 
@@ -56,8 +60,19 @@ func (ts *TransactionService) AddTransaction(txn transaction.Transaction) {
 	// not double spending means new txn
 	//if double spending no action taken
 	if !doubleSpending {
+		//save transaction to mempool
 		ts.MemPool.Save(txn)
+		//distribute txn
+		//distributing txn prior to updating node is important
+		//otherwise new node txn also will be delivered to new node
 		distributeTransaction(txn)
+		//for node validator txn
+		if len(txn.Data) > 0 {
+			address, _ := txn.Data["Address"].(string)
+			status, _ := txn.Data["Status"].(string)
+			st := domain.NodeStatusFromString(status)
+			ts.NodeDb.UpdateNodeStatus(address, st)
+		}
 	}
 }
 
@@ -72,8 +87,14 @@ func distributeTransaction(txn transaction.Transaction) {
 		Sender:   txn.Sender,
 		Fee:      txn.Fee,
 		Id:       txn.Id,
+		Data:     txn.Data,
 	})
 	for _, node := range knownNodes {
+		if node.Status != domain.ACTIVE {
+			// new transactions will be distributed among only active nodes
+			app.Logger.Info.Log(fmt.Sprintf("Node %s is not active, skipping...", node.Ip))
+			continue
+		}
 		req, _ := http.NewRequest(http.MethodPost, node.Ip+"/transaction/add", bytes.NewReader(body))
 		client := util.GeHttpsClient(node.Certificate)
 		client.Timeout = time.Second * time.Duration(config.AppConfig.NodeDistributionTimeOut)

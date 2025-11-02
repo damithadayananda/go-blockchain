@@ -87,6 +87,8 @@ func (app *Application) InitCertificate() {
 	}
 }
 
+// InitAddress
+// address of the node is first 20 charactors of the public key
 func (app *Application) InitAddress() {
 	pubKeyBytes, err := x509.MarshalPKIXPublicKey(&app.privateKey.PublicKey)
 	if err != nil {

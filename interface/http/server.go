@@ -13,13 +13,14 @@ import (
 	"net/http"
 )
 
-func InitServer(txnCtrl controller.TransactionController) {
+func InitServer(txnCtrl controller.TransactionController,
+	nodeCtrl controller.NodeController) {
 	mux := mux.NewRouter()
 	apiHandler := api.API{}
 	apiHandler.RegisterAPI(mux,
 		txnCtrl,
 		&controller.ChainControllerImpl{},
-		&controller.NodeControllerImpl{},
+		nodeCtrl,
 		&controller.BlockControllerImpl{
 			PreProcessor: pre_processor.IndexValidator{},
 		})

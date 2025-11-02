@@ -152,6 +152,11 @@ func (c *BlockChain) DistributeBlock(block *block.Block) error {
 	}
 
 	for _, node := range nodesToBeInformed {
+		if node.Status != domain.ACTIVE {
+			// new transactions will be distributed among only active nodes
+			app.Logger.Info.Log(fmt.Sprintf("Node %s is not active, skipping...", node.Ip))
+			continue
+		}
 		reqBody := request.BlockRequest{
 			Block: request.Block{
 				Index:        block.Index,

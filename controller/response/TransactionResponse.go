@@ -8,13 +8,14 @@ type TransactionResponse struct {
 }
 
 type Transaction struct {
-	Id           string  `json:"id"`
-	Amount       float64 `json:"amount"`
-	Receiver     string  `json:"receiver"`
-	Sender       string  `json:"sender"`
-	Fee          float64 `json:"fee"`
-	Size         int     `json:"size"`
-	MiningStatus string  `json:"miningStatus"`
+	Id           string                 `json:"id"`
+	Amount       float64                `json:"amount"`
+	Receiver     string                 `json:"receiver"`
+	Sender       string                 `json:"sender"`
+	Fee          float64                `json:"fee"`
+	Size         int                    `json:"size"`
+	MiningStatus string                 `json:"miningStatus"`
+	Data         map[string]interface{} `json:"data"`
 }
 
 func (t *Transaction) FromDomain(transaction transaction.Transaction) {
@@ -25,4 +26,5 @@ func (t *Transaction) FromDomain(transaction transaction.Transaction) {
 	t.Fee = transaction.Fee
 	t.Size = transaction.Size
 	t.MiningStatus = transaction.MiningStatus.String()
+	t.Data = transaction.Data
 }

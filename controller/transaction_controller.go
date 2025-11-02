@@ -49,6 +49,7 @@ func (cr *TransactionControllerImpl) AddTransaction(r *http.Request) interface{}
 		Sender:   txnRequest.Sender,
 		Fee:      txnRequest.Fee,
 		Id:       txnRequest.Id,
+		Data:     txnRequest.Data,
 	})
 	txn.SetMiningStatus(domain.READY_FOR_MINING)
 	cr.TxnSvc.AddTransaction(txn)

@@ -6,13 +6,14 @@ import (
 )
 
 type Transaction struct {
-	Id           string              `json:"id"`
-	Amount       float64             `json:"amount"`
-	Receiver     string              `json:"receiver"`
-	Sender       string              `json:"sender"`
-	Fee          float64             `json:"fee"`
-	Size         int                 `json:"size"`
-	MiningStatus domain.MiningStates `json:"miningStatus"`
+	Id           string                 `json:"id"`
+	Amount       float64                `json:"amount"`
+	Receiver     string                 `json:"receiver"`
+	Sender       string                 `json:"sender"`
+	Fee          float64                `json:"fee"`
+	Size         int                    `json:"size"`
+	MiningStatus domain.MiningStates    `json:"miningStatus"`
+	Data         map[string]interface{} `json:"data"`
 }
 
 func (t *Transaction) generateId() {
@@ -33,6 +34,7 @@ func NewTransaction(request Transaction) Transaction {
 		Sender:   request.Sender,
 		Fee:      request.Fee,
 		Id:       request.Id,
+		Data:     request.Data,
 	}
 	if request.Id == "" {
 		transaction.generateId()

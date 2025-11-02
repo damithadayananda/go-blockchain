@@ -10,6 +10,7 @@ import (
 	"go-blockchain/controller/response"
 	"go-blockchain/core/node"
 	"go-blockchain/domain"
+	"go-blockchain/service"
 	"go-blockchain/util"
 	"io"
 	"net/http"
@@ -19,9 +20,11 @@ import (
 type NodeController interface {
 	AddNode(r *http.Request) interface{}
 	GetNode(r *http.Request) interface{}
+	Validate(r *http.Request) interface{}
 }
 
 type NodeControllerImpl struct {
+	TxnService service.TransactionService
 }
 
 func (cr *NodeControllerImpl) AddNode(r *http.Request) interface{} {
@@ -41,6 +44,7 @@ func (cr *NodeControllerImpl) AddNode(r *http.Request) interface{} {
 		Ip:          addNodeReq.Url,
 		Certificate: addNodeReq.Certificate,
 		Address:     addNodeReq.Address,
+		Status:      domain.PENDING_VALIDATION,
 	})
 	if err != nil {
 		app.Logger.Error.Log("Error saving addNode", err)
@@ -69,10 +73,10 @@ func (cr *NodeControllerImpl) distributingNodeDetails(nodeRequest request.AddNod
 	iPsToBeInformed := getNodesToBeInformed(extractNodeIPs(nodeRequest.InformedNodes), extractNodeIPs(knownNodes))
 	for _, node := range getNodeFromIp(knownNodes, iPsToBeInformed) {
 		body, _ := json.Marshal(request.AddNodeRequest{
-			Url:           node.Ip,
+			Url:           nodeRequest.Url,
 			InformedNodes: append(nodeRequest.InformedNodes, createNodesToBeInformed(knownNodes, iPsToBeInformed)...),
-			Certificate:   node.Certificate,
-			Address:       node.Address,
+			Certificate:   nodeRequest.Certificate,
+			Address:       nodeRequest.Address,
 		})
 		req, _ := http.NewRequest(http.MethodPost, node.Ip+"/node/add", bytes.NewReader(body))
 		client := util.GeHttpsClient(node.Certificate)
@@ -166,7 +170,49 @@ func fromDomainNodeToNode(nodes []domain.Node) []response.Node {
 			Ip:          v.Ip,
 			Certificate: v.Certificate,
 			Address:     v.Address,
+			Status:      v.Status.String(),
 		})
 	}
 	return res
+}
+
+// Validate node function to validate new node to join the network
+// it will do multiple validation here
+// in this validation only one node is going to perform validation
+// as a future enhrasment multiple validator nodes will come together for final validation result
+func (cr *NodeControllerImpl) Validate(r *http.Request) interface{} {
+	reqBody, _ := io.ReadAll(r.Body)
+	app.Logger.Info.Log("Validate Request", string(reqBody))
+	validateNodeReq := request.ValidateNodeRequest{}
+	if err := json.Unmarshal(reqBody, &validateNodeReq); err != nil {
+		app.Logger.Info.Log("Validate Request", string(reqBody))
+		return response.FailResponse{
+			BaseResponse: response.BaseResponse{
+				Success: false,
+			},
+			Error: err.Error(),
+		}
+	}
+	txn, err := node.NodeRef.ValidateNewNode(domain.NodeValidate{
+		Address:     validateNodeReq.Address,
+		Certificate: []byte(validateNodeReq.Certificate),
+	})
+	if err != nil {
+		app.Logger.Error.Log("Error saving addNode", err)
+		return response.FailResponse{
+			BaseResponse: response.BaseResponse{
+				Success: false,
+			},
+			Error: err.Error(),
+		}
+	}
+
+	// will add node txn
+	cr.TxnService.AddTransaction(txn)
+
+	return response.SuccessResponse{
+		BaseResponse: response.BaseResponse{
+			Success: true,
+		},
+	}
 }

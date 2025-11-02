@@ -8,3 +8,8 @@ type AddNodeRequest struct {
 	Certificate   []byte        `json:"certificate"`
 	Address       string        `json:"address"`
 }
+
+type ValidateNodeRequest struct {
+	Address     string `json:"address"`
+	Certificate string `json:"certificate"`
+}

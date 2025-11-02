@@ -51,6 +51,12 @@ func (api *API) RegisterAPI(mux *mux.Router,
 		w.Write(data)
 	})
 
+	node.HandleFunc("/validate", func(w http.ResponseWriter, r *http.Request) {
+		validateData := api.nodeController.Validate(r)
+		data, _ := json.Marshal(validateData)
+		w.Write(data)
+	})
+
 	// block routes
 	block := mux.PathPrefix("/block").Subrouter()
 	block.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {

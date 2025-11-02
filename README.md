@@ -19,3 +19,11 @@ blockchain written in go for educational purpose
 
 # unit test 
 run the shell scrip inside scripts directory `./unit-test.sh`
+
+# curl for triggering validate node
+curl --location --request GET 'https://localhost:8080/node/validate' \
+--header 'Content-Type: application/json' \
+--data '{
+"address":"d5efaa68cb559d469ee7f5b703b66f4900d60d4a"
+}'
+

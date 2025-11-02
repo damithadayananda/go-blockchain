@@ -30,12 +30,15 @@ func main() {
 	minor.NewMinor(memPoolRef)
 	// initializing node db
 	nodeDb := inmemorydb.NewInMemoryNode()
-	//initializing node
-	node.NewNode(nodeDb)
 	//services
-	txnService := service.NewTransactionService(memPoolRef)
+	txnService := service.NewTransactionService(memPoolRef, nodeDb)
 	//controllers
 	txnCtrl := controller.NewTransactionController(memPoolRef, txnService)
+	//initializing node
+	node.NewNode(nodeDb)
+	nodeCtrl := &controller.NodeControllerImpl{
+		TxnService: txnService,
+	}
 	//initializing http server
-	http.InitServer(txnCtrl)
+	http.InitServer(txnCtrl, nodeCtrl)
 }

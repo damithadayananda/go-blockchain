@@ -59,6 +59,9 @@ const NodeList = ({ nodes }) => {
                             </ListItem>
                             <Collapse in={expandedIndex === index} timeout="auto" unmountOnExit>
                                 <Box sx={{ padding: 2, backgroundColor: '#f9f9f9', borderTop: '1px solid #ddd' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>STATUS:</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1 }}>{node.Status}</Typography>
+
                                     <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>IP:</Typography>
                                     <Typography variant="body2" sx={{ mb: 1 }}>{node.Ip}</Typography>
 

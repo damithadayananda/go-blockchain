@@ -17,3 +17,14 @@ func (m NodeStatus) String() string {
 		return "UNKNOWN"
 	}
 }
+
+func NodeStatusFromString(str string) NodeStatus {
+	switch str {
+	case "ACTIVE":
+		return ACTIVE
+	case "PENDING_VALIDATION":
+		return PENDING_VALIDATION
+	default:
+		return ACTIVE
+	}
+}
