@@ -12,6 +12,9 @@ knownNodes:
   - ip: https://localhost:8081
     certificatePath: "secrets/node2/cert.pem"
     address: "ee7bce14cd33511216a54b7c377b519956e9ced8"
+  - ip: https://localhost:8083
+    certificatePath: "secrets/node4/cert.pem"
+    address: "d5efaa68cb559d469ee7f5b703b66f4900d60d4a"
 
 ## block
 blockDistributionTimeout: 300

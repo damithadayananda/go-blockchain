@@ -2,6 +2,8 @@ GO_VERSION_REQ=1.18.0
 OUTPUT_BINARY_1=node-01
 OUTPUT_BINARY_2=node-02
 OUTPUT_BINARY_3=node-03
+OUTPUT_BINARY_4=node-04
+
 
 check-go-version:
 	@echo "Checking Go version..."
@@ -16,11 +18,15 @@ build:
 	go build -o $(OUTPUT_BINARY_1)
 	go build -o $(OUTPUT_BINARY_2)
 	go build -o $(OUTPUT_BINARY_3)
+	go build -o $(OUTPUT_BINARY_4)
+
 
 run:
 	@echo "Running the binaries with different config files..."
 	@CONFIG_PATH=./config/config_1.yml ./$(OUTPUT_BINARY_1) & \
 	CONFIG_PATH=./config/config_2.yml ./$(OUTPUT_BINARY_2) & \
-	CONFIG_PATH=./config/config_3.yml ./$(OUTPUT_BINARY_3)
+	CONFIG_PATH=./config/config_3.yml ./$(OUTPUT_BINARY_3) & \
+    CONFIG_PATH=./config/config_4.yml ./$(OUTPUT_BINARY_4)
+
 
 build-multiple-node: check-go-version build run

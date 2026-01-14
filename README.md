@@ -27,3 +27,11 @@ curl --location --request GET 'https://localhost:8080/node/validate' \
 "address":"d5efaa68cb559d469ee7f5b703b66f4900d60d4a"
 }'
 
+# certificate generation
+./scripts/certificate-generation.sh <output dir>
+./scripts/certificate-generation.sh ./secrets/node5
+
+# running unit tests
+go test -v -run '^(?!.*_IT$).*' ./...
+
+

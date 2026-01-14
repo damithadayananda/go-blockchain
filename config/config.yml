@@ -3,16 +3,22 @@ maxTransactionsPerBlock: 2
 
 ## node
 host: https://localhost
-port: 8081
+port: 8080
 nodeDistributionTimeOut: 30
 knownNodes:
-  - https://localhost:8081
-  - https://localhost:8082
-
+  - ip: https://localhost:8081
+    certificatePath: "secrets/node2/cert.pem"
+    address: "ee7bce14cd33511216a54b7c377b519956e9ced8"
+  - ip: https://localhost:8082
+    certificatePath: "secrets/node3/cert.pem"
+    address: "463a35f25437678996041fb93fcb87bf8d86ac98"
+  - ip: https://localhost:8083
+    certificatePath: "secrets/node4/cert.pem"
+    address: "d5efaa68cb559d469ee7f5b703b66f4900d60d4a"
 ## block
 blockDistributionTimeout: 30
 blockInquiryTimeOut: 30
-secretDir: secrets
+secretDir: secrets/node1
 
 ## genesis
 inGenesis: true

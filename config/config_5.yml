@@ -3,7 +3,7 @@ maxTransactionsPerBlock: 2
 
 ## node
 host: https://localhost
-port: 8083
+port: 8084
 nodeDistributionTimeOut: 300
 knownNodes:
   - ip: https://localhost:8080
@@ -18,7 +18,7 @@ knownNodes:
 ## block
 blockDistributionTimeout: 300
 blockInquiryTimeOut: 30
-secretDir: secrets/node4
+secretDir: secrets/node5
 
 ## genesis
 inGenesis: false
